@@ -6,16 +6,16 @@ Super Simple Crawler for PHP 8
 //Composer
 require 'vendor/autoload.php';
 
-s
 // Libs
 use GuzzleHttp\Client;
 use GuzzleHttp\Pool;
 use GuzzleHttp\Psr7\Uri;
 use GuzzleHttp\Psr7\UriResolver;
 use Psr\Http\Message\ResponseInterface;
+use SuperSimple\Crawler;
 
 // Configure the crawler.
-$crawler = new SuperSimpleCrawler();
+$crawler = new Crawler();
 try {
     $crawler->setUrl("https://www.php.net/"); // Set the URL.
     $crawler->setPort(80); // Set the port (80 is the default HTTP port).
