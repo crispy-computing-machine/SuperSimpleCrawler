@@ -6,17 +6,13 @@ Super Simple Crawler for PHP 8
 //Composer
 require 'vendor/autoload.php';
 
-// Libs
+s
 // Libs
 use GuzzleHttp\Client;
 use GuzzleHttp\Pool;
 use GuzzleHttp\Psr7\Uri;
 use GuzzleHttp\Psr7\UriResolver;
 use Psr\Http\Message\ResponseInterface;
-use \DOMDocument;
-use \DOMXPath;
-use \Exception;
-use \RuntimeException;
 
 // Configure the crawler.
 $crawler = new SuperSimpleCrawler();
