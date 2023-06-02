@@ -1,6 +1,6 @@
 <?php
 
-namespace SuperSimple\SuperSimple;
+namespace SuperSimple;
 
 // Libs
 use GuzzleHttp\Client;
@@ -12,7 +12,6 @@ use \DOMDocument;
 use \DOMXPath;
 use \Exception;
 use \RuntimeException;
-use SuperSimple\CrawlerCompleteException;
 
 /**
  * Crawl a webpage with a configured crawler

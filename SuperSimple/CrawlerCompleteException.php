@@ -1,6 +1,6 @@
 <?php
 
-namespace SuperSimple\SuperSimple;
+namespace SuperSimple;
 /**
  * Not really an exception.
  *
