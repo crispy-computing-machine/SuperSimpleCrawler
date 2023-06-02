@@ -11,13 +11,9 @@ composer require crispy-computing-machine/supersimplecrawler
 require 'vendor/autoload.php';
 
 // Libs
-use GuzzleHttp\Client;
-use GuzzleHttp\Pool;
-use GuzzleHttp\Psr7\Uri;
-use GuzzleHttp\Psr7\UriResolver;
-use Psr\Http\Message\ResponseInterface;
 use SuperSimple\Crawler;
 use SuperSimple\CrawlerCompleteException;
+use DOMDocument;
 
 // Configure the crawler.
 $crawler = new Crawler();
