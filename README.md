@@ -16,6 +16,7 @@ use GuzzleHttp\Psr7\Uri;
 use GuzzleHttp\Psr7\UriResolver;
 use Psr\Http\Message\ResponseInterface;
 use SuperSimple\Crawler;
+use SuperSimple\CrawlerCompleteException;
 
 // Configure the crawler.
 $crawler = new Crawler();
