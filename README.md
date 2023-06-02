@@ -1,8 +1,11 @@
 # SuperSimpleCrawler
 Super Simple Crawler for PHP 8
 
-```php
+```
+composer require crispy-computing-machine/supersimplecrawler
+```
 
+```php
 //Composer
 require 'vendor/autoload.php';
 
@@ -48,13 +51,13 @@ try {
 } catch (CrawlerCompleteException $e) {
 
     // Crawler complete report
-    SuperSimpleCrawler::log("Total pages downloaded: " . $e->getTotalPages(), "info");
-    SuperSimpleCrawler::log("Total size downloaded: " . $e->getTotalSize() . " bytes", "info");
-    SuperSimpleCrawler::log("Total links followed: " . $e->getTotalLinks(), "info");
-    SuperSimpleCrawler::log("Abort Reason: " . $e->getMessage(), "info");
+    Crawler::log("Total pages downloaded: " . $e->getTotalPages(), "info");
+    Crawler::log("Total size downloaded: " . $e->getTotalSize() . " bytes", "info");
+    Crawler::log("Total links followed: " . $e->getTotalLinks(), "info");
+    Crawler::log("Abort Reason: " . $e->getMessage(), "info");
 
 } finally {
     // Additional clean up or summary actions
-    SuperSimpleCrawler::log("Crawler has ended gracefully.", "success");
+    Crawler::log("Crawler has ended gracefully.", "success");
 }
 ```
