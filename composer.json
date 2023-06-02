@@ -1,0 +1,15 @@
+{
+  "name": "crispy-computing-machine/supersimplecrawler",
+  "description": "PHP 8 web crawler",
+  "keywords": [
+    "php",
+    "crawler"
+  ],
+  "config": {
+    "optimize-autoloader": true
+  },
+  "require": {
+    "php": "^8.2.0",
+    "guzzlehttp/guzzle": "^7.7"
+  }
+}
