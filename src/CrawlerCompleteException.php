@@ -1,4 +1,6 @@
 <?php
+
+namespace SuperSimple\SuperSimple;
 /**
  * Not really an exception.
  *
@@ -35,7 +37,8 @@ class CrawlerCompleteException extends Exception
      * @param int $code
      * @param Exception|null $previous
      */
-    public function __construct($message, $totalPages, $totalSize, $totalLinks, int $code = 0, Exception $previous = null) {
+    public function __construct($message, $totalPages, $totalSize, $totalLinks, int $code = 0, Exception $previous = null)
+    {
         parent::__construct($message, $code, $previous);
         $this->setTotalPages($totalPages);
         $this->setTotalSize($totalSize);

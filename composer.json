@@ -8,6 +8,11 @@
   "config": {
     "optimize-autoloader": true
   },
+  "autoload": {
+    "psr-4": {
+      "SuperSimple\\": "/src"
+    }
+  },
   "require": {
     "php": "^8.2.0",
     "guzzlehttp/guzzle": "^7.7"

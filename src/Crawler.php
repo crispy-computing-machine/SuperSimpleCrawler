@@ -1,17 +1,24 @@
 <?php
 
+namespace SuperSimple\SuperSimple;
+
 // Libs
 use GuzzleHttp\Client;
 use GuzzleHttp\Pool;
 use GuzzleHttp\Psr7\Uri;
 use GuzzleHttp\Psr7\UriResolver;
 use Psr\Http\Message\ResponseInterface;
+use \DOMDocument;
+use \DOMXPath;
+use \Exception;
+use \RuntimeException;
+use SuperSimple\CrawlerCompleteException;
 
 /**
  * Crawl a webpage with a configured crawler
  * Uses "guzzlehttp/guzzle": "^7.2"
  */
-class SuperSimpleCrawler
+class Crawler
 {
 
     /**
