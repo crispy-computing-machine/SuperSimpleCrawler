@@ -588,7 +588,7 @@ class Crawler
 
                         // Extract this pages link sand add them to a queue
                         self::log('Extracting links from URL: ' . $url . '(Root:'.$rootUrl.')', "info");
-                        $links = SuperSimpleCrawler::extractLinks($content, $rootUrl);
+                        $links = self::extractLinks($content, $rootUrl);
                         foreach ($links as $link){
                             if (!isset($this->visitedUrls[$link])) {
                                 $this->setURL($link);
