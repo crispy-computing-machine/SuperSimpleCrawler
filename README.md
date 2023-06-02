@@ -1,5 +1,6 @@
 # SuperSimpleCrawler
 Super Simple Crawler for PHP 8
+[![Latest Stable Version](https://poser.pugx.org/crispy-computing-machine/SuperSimpleCrawler/v/stable)](https://packagist.org/packages/crispy-computing-machine/SuperSimpleCrawler) [![Total Downloads](https://poser.pugx.org/bcrispy-computing-machine/SuperSimpleCrawler/downloads)](https://packagist.org/packages/crispy-computing-machine/SuperSimpleCrawler)
 
 ```
 composer require crispy-computing-machine/supersimplecrawler
