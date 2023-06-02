@@ -1,6 +1,8 @@
 <?php
 
 namespace SuperSimple;
+use Exception;
+
 /**
  * Not really an exception.
  *
