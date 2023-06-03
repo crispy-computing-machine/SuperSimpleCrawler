@@ -184,15 +184,10 @@ class Crawler
     /**
      * Crawler object basic setup
      */
-    public function __construct()
+    public function __construct($verbose = false)
     {
         $this->client = new Client();
-
-        // Check if verbose (-v) flag is set
-        $options = getopt("v");
-        if (isset($options['v'])) {
-            self::$verbose = true;
-        }
+        self::$verbose = $verbose;
     }
 
     /**
@@ -677,6 +672,8 @@ class Crawler
             $promise = $pool->promise();
             $promise->wait();
         } while ($this->activeRequests > 0 || !empty($this->urls));
+
+        throw new CrawlerCompleteException('Crawl Complete! ', $this->totalPages, $this->totalTraffic, count($this->urls));
 
     }
 

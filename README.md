@@ -16,7 +16,7 @@ use SuperSimple\CrawlerCompleteException;
 use DOMDocument;
 
 // Configure the crawler.
-$crawler = new Crawler();
+$crawler = new Crawler($verbose = true);
 try {
     $crawler->setUrl("https://www.php.net/"); // Set the URL.
     $crawler->setPort(80); // Set the port (80 is the default HTTP port).
