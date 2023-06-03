@@ -179,6 +179,7 @@ class Crawler
      */
     private int $streamTimeout;  // No timeout by default
 
+    private int $concurrency = 1;
 
     /**
      * Crawler object basic setup
@@ -204,6 +205,17 @@ class Crawler
     {
         $this->urls[] = $url;
         return true;
+    }
+
+    /**
+     * @param int $concurrency
+     */
+    public function setConcurrency(int $concurrency): void
+    {
+        if ($concurrency < 0) {
+            throw new RuntimeException('Invalid concurrecy value');
+        }
+        $this->concurrency = $concurrency;
     }
 
     /**
@@ -637,7 +649,7 @@ class Crawler
 
         // Main crawler client config based on configuration options passed in
         $clientOptions = [
-            'concurrency' => 5,
+            'concurrency' => $this->concurrency,
             'allow_redirects' => $this->followRedirects,
             'delay' => $this->requestDelay,
             'timeout' => $this->timeout,

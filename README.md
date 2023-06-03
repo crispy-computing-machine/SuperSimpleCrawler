@@ -32,6 +32,7 @@ try {
     $crawler->setConnectionTimeout(10); // Set the connection timeout (10 seconds).
     $crawler->setStreamTimeout(20); // Set the stream timeout (20 seconds).
     $crawler->setRequestDelay(3000); // Wait 1048576 millisecond between requests.
+    $crawler->setConcurrency(10); // multiprocessing mode
 
     // Handle doc
     $crawler->setFulfilledCallback(function($url, DOMDocument $content){
