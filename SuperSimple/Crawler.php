@@ -4,6 +4,8 @@ namespace SuperSimple;
 
 // Libs
 use GuzzleHttp\Client;
+use GuzzleHttp\Cookie\CookieJar;
+use GuzzleHttp\Cookie\CookieJarInterface;
 use GuzzleHttp\Pool;
 use GuzzleHttp\Psr7\Uri;
 use GuzzleHttp\Psr7\UriResolver;
@@ -179,7 +181,28 @@ class Crawler
      */
     private int $streamTimeout;  // No timeout by default
 
+    /**
+     * Curl Multi
+     * @var int
+     */
     private int $concurrency = 1;
+
+    /**
+     * Robots dissallowed
+     * @var array
+     */
+    private array $disallowedPaths;
+
+    /**
+     * @var CookieJarInterface
+     */
+    private $cookieJar;
+
+    /**
+     * SSL certs
+     * @var string
+     */
+    private string $cacertPath;
 
     /**
      * Crawler object basic setup
@@ -187,6 +210,7 @@ class Crawler
     public function __construct($verbose = false)
     {
         $this->client = new Client();
+        $this->cookieJar = new CookieJar();
         self::$verbose = $verbose;
     }
 
@@ -198,8 +222,46 @@ class Crawler
      */
     public function setURL(string $url): ?bool
     {
+        // Fetch and store disallowed paths from robots.txt
+        $this->disallowedPaths = $this->fetchRobotsTxt($url);
         $this->urls[] = $url;
         return true;
+    }
+
+    /**
+     * First url added becomes root URL
+     * Additional URLS will be added to queue and crawled
+     * @param string $url
+     * @return bool|null
+     */
+    public function addURL(string $url): ?bool
+    {
+        $this->urls[] = $url;
+        return true;
+    }
+
+    /**
+     * Fetch and parse robots.txt file from base URL
+     *
+     * @param string $baseUrl The base URL of the website being crawled.
+     * @return array An array of disallowed paths.
+     */
+    public function fetchRobotsTxt(string $baseUrl): array
+    {
+        $url = rtrim($baseUrl, '/') . '/robots.txt';
+        $response = $this->client->request('GET', $url, ['verify' => false]);
+        $content = $response->getBody()->getContents();
+
+        // Parse the content of robots.txt
+        $disallowed = [];
+        $lines = explode("\n", $content);
+        foreach ($lines as $line) {
+            if (strpos($line, 'Disallow:') === 0) {
+                $disallowed[] = trim(substr($line, strlen('Disallow:')));
+            }
+        }
+
+        return $disallowed;
     }
 
     /**
@@ -380,6 +442,11 @@ class Crawler
     public function setCertificateVerify(bool $verify): void
     {
         $this->certificateVerify = $verify;
+        if($this->certificateVerify){
+            // Download the cacert.pem file
+            file_put_contents($this->cacertPath = $this->workingDirectory . '/cacert.pem', file_get_contents('https://curl.se/ca/cacert.pem'));
+        }
+
     }
 
     /**
@@ -413,13 +480,10 @@ class Crawler
 
         // Load the HTML into a DOMDocument.
         $doc = self::createDom($html);
-
         // Create a DOMXPath object for querying the document.
         $xpath = new DOMXPath($doc);
-
         // Query all <a> elements with a href attribute.
         $nodes = $xpath->query('//a[@href]');
-
         // Extract and normalize the URL from each node.
         foreach ($nodes as $node) {
             $url = $node->getAttribute('href');
@@ -429,7 +493,6 @@ class Crawler
 
             $links[] = $url;
         }
-
         return $links;
     }
 
@@ -450,7 +513,6 @@ class Crawler
         // Reset error handling.
         libxml_clear_errors();
         libxml_use_internal_errors(false);
-
         return $doc;
     }
 
@@ -498,6 +560,12 @@ class Crawler
         $requests = function ($urls) {
 
             foreach ($urls as $url) {
+
+                // If the URL path is disallowed, skip it
+                $parsedUrlPath = parse_url($url, PHP_URL_PATH);
+                if (in_array($parsedUrlPath, $this->disallowedPaths)) {
+                    continue;
+                }
 
                 // Check limit
                 if (isset($this->requestLimit) && $this->totalPages >= $this->requestLimit) {
@@ -593,17 +661,6 @@ class Crawler
                             }
                         }
 
-                        // Extract this pages link sand add them to a queue
-                        self::log('Extracting links from URL: ' . $url . '(Root:'.$rootUrl.')', "info");
-                        $links = self::extractLinks($content, $rootUrl);
-                        foreach ($links as $link){
-                            if (!isset($this->visitedUrls[$link])) {
-                                $this->setURL($link);
-                            }
-                        }
-                        self::log('Added ' . count($links) .' links!', "success");
-                        self::log('Total links: ' . $this->totalPages, "info");
-
                         // If a callback function is set, call it
                         if (isset($this->fulfilledCallback)) {
                             try{
@@ -612,7 +669,6 @@ class Crawler
                                 self::log($e->getMessage(), "error");
 
                             }
-
                         }
 
                         // If a callback function is set, call it
@@ -624,6 +680,16 @@ class Crawler
                             }
                         }
 
+
+                        // Extract this pages link sand add them to a queue
+                        self::log('Extracting links from URL: ' . $url . ' (Root:'.$rootUrl.')', "info");
+                        $links = self::extractLinks($content, $rootUrl);
+                        foreach($links as $link){
+                            if(!isset($this->visitUrls[$link])){
+                                self::log('Adding URL: ' . $link . ' (Root:'.$rootUrl.')', "info");
+                                $this->addURL($link);
+                            }
+                        }
 
                         // Decrement active request count. (we just processed a url)
                         $this->activeRequests--;
@@ -648,6 +714,7 @@ class Crawler
             'allow_redirects' => $this->followRedirects,
             'delay' => $this->requestDelay,
             'timeout' => $this->timeout,
+            'cookies' => $this->cookieJar  // Use the cookie jar
         ];
 
         if (isset($this->proxy)) {
@@ -659,7 +726,9 @@ class Crawler
         }
 
         if ($this->certificateVerify) {
-            $clientOptions['verify'] = $this->certificateVerify;
+            $clientOptions['verify'] = $this->cacertPath;
+        } else {
+            $clientOptions['verify'] = false; // insecure
         }
 
         if (isset($this->streamTimeout)) {
