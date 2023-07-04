@@ -33,7 +33,8 @@ try {
     $crawler->setStreamTimeout(20); // Set the stream timeout (20 seconds).
     $crawler->setRequestDelay(3000); // Wait 1048576 millisecond between requests.
     $crawler->setConcurrency(10); // multiprocessing mode
-
+    $crawler->addContentTypeReceiveRule(['text/html', 'application/json']);
+    
     // Handle doc
     $crawler->setFulfilledCallback(function($url, DOMDocument $content){
         echo 'Successful request! ' . $url . ' -> ' . strlen($content->textContent) . PHP_EOL;

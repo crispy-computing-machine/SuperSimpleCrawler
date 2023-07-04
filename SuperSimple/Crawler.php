@@ -29,6 +29,12 @@ class Crawler
     private static bool $verbose = false;
 
     /**
+     * text/html etc...
+     * @var array
+     */
+    private array $acceptedContentTypes;
+
+    /**
      * Actually the "currently processing documents"
      * @var int
      */
@@ -238,6 +244,11 @@ class Crawler
     {
         $this->urls[] = $url;
         return true;
+    }
+
+    public function addContentTypeReceiveRule(array $contentTypes){
+
+        $this->acceptedContentTypes = $contentTypes;
     }
 
     /**
@@ -730,6 +741,10 @@ class Crawler
             'timeout' => $this->timeout,
             'cookies' => $this->cookieJar  // Use the cookie jar
         ];
+
+        if (isset($this->acceptedContentTypes)) {
+            $clientOptions['headers']['Accept'] = implode(',', $this->acceptedContentTypes);
+        }
 
         if (isset($this->proxy)) {
             $clientOptions['proxy'] = $this->proxy;
