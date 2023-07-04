@@ -701,6 +701,7 @@ class Crawler
 
                     // yield request to process, and mark as visited
                     $this->visitedUrls[$url] = true;
+                    array_shift($this->urls); // remove URL
                     $this->linksFollowed++;
                     return $requestPromise;
                 };
@@ -740,7 +741,7 @@ class Crawler
             $pool = new Pool($this->client, $requests($this->urls), $clientOptions);
             $promise = $pool->promise();
             $promise->wait();
-        } while ($this->activeRequests > 0 || !empty($this->urls));
+        } while ($this->activeRequests > 0 && !empty($this->urls));
 
         throw new CrawlerCompleteException('Crawl Complete! ', $this->totalPages, $this->totalTraffic, count($this->urls));
 
