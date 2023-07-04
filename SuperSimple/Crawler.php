@@ -248,18 +248,20 @@ class Crawler
      */
     public function fetchRobotsTxt(string $baseUrl): array
     {
-        $url = rtrim($baseUrl, '/') . '/robots.txt';
-        $response = $this->client->request('GET', $url, ['verify' => false]);
-        $content = $response->getBody()->getContents();
-
-        // Parse the content of robots.txt
         $disallowed = [];
-        $lines = explode("\n", $content);
-        foreach ($lines as $line) {
-            if (strpos($line, 'Disallow:') === 0) {
-                $disallowed[] = trim(substr($line, strlen('Disallow:')));
+        try{
+            $url = rtrim($baseUrl, '/') . '/robots.txt';
+            $response = $this->client->request('GET', $url, ['verify' => false]);
+            $content = $response->getBody()->getContents();
+
+            // Parse the content of robots.txt
+            $lines = explode("\n", $content);
+            foreach ($lines as $line) {
+                if (strpos($line, 'Disallow:') === 0) {
+                    $disallowed[] = trim(substr($line, strlen('Disallow:')));
+                }
             }
-        }
+        } catch (Exception $e){}
 
         return $disallowed;
     }
@@ -510,6 +512,8 @@ class Crawler
         $doc = new DOMDocument();
         $doc->loadHTML($html);
 
+        #var_dump(libxml_get_errors());
+
         // Reset error handling.
         libxml_clear_errors();
         libxml_use_internal_errors(false);
@@ -591,7 +595,7 @@ class Crawler
                     case 2:
                         // follow links with same host
                         if ($parsedUrl['host'] !== $rootUrlParsed['host']) {
-                           self::log('Skipping (wrong domain/subdomain): ' . $url, "info");
+                            self::log('Skipping (wrong domain/subdomain): ' . $url, "info");
                             continue 2;
                         }
                         break;
@@ -661,26 +665,6 @@ class Crawler
                             }
                         }
 
-                        // If a callback function is set, call it
-                        if (isset($this->fulfilledCallback)) {
-                            try{
-                                call_user_func($this->fulfilledCallback, $url, self::createDom($content));
-                            } catch (Exception $e){
-                                self::log($e->getMessage(), "error");
-
-                            }
-                        }
-
-                        // If a callback function is set, call it
-                        if (isset($this->rejectedCallback) && $statusCode !== 200) {
-                            try{
-                                call_user_func($this->rejectedCallback, $url, self::createDom($content));
-                            } catch (Exception $e){
-                                self::log($e->getMessage(), "error");
-                            }
-                        }
-
-
                         // Extract this pages link sand add them to a queue
                         self::log('Extracting links from URL: ' . $url . ' (Root:'.$rootUrl.')', "info");
                         $links = self::extractLinks($content, $rootUrl);
@@ -690,6 +674,35 @@ class Crawler
                                 $this->addURL($link);
                             }
                         }
+
+                        if(count($links) == 0){
+                            self::log('No links to add: ' . $link . ' (Root:'.$rootUrl.')', "info");
+                        }
+
+                        // If a callback function is set, call it
+                        self::log('Calling fullfilled callback...', "info");
+                        if (isset($this->fulfilledCallback)) {
+                            try{
+                                $result = call_user_func($this->fulfilledCallback, $url, self::createDom($content));
+                                self::log('Result: ' / var_export($result, true), "info");
+
+                            } catch (Exception $e){
+                                self::log($e->getMessage(), "error");
+
+                            }
+                        }
+
+                        // If a callback function is set, call it
+                        self::log('Calling rejected callback...', "info");
+                        if (isset($this->rejectedCallback) && $statusCode !== 200) {
+                            try{
+                                call_user_func($this->rejectedCallback, $url, self::createDom($content));
+                            } catch (Exception $e){
+                                self::log($e->getMessage(), "error");
+                            }
+                        }
+
+
 
                         // Decrement active request count. (we just processed a url)
                         $this->activeRequests--;
@@ -701,7 +714,7 @@ class Crawler
 
                     // yield request to process, and mark as visited
                     $this->visitedUrls[$url] = true;
-                    array_shift($this->urls); // remove URL
+                    array_shift($this->urls);
                     $this->linksFollowed++;
                     return $requestPromise;
                 };
