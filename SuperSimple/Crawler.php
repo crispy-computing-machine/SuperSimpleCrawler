@@ -58,7 +58,13 @@ class Crawler
     private $rejectedCallback;
 
     /**
-     * Main URl queue. First url is always the root
+     * The root URL
+     * @var array
+     */
+    private string $rootUrl;
+
+    /**
+     * Main URl queue.
      * @var array
      */
     private array $urls = [];
@@ -228,6 +234,12 @@ class Crawler
      */
     public function setURL(string $url): ?bool
     {
+
+        // First?
+        if(!isset($this->rootUrl)){
+            $this->rootUrl = $url;
+        }
+
         // Fetch and store disallowed paths from robots.txt
         $this->disallowedPaths = $this->fetchRobotsTxt($url);
         $this->urls[] = $url;
@@ -596,7 +608,7 @@ class Crawler
                 }
 
                 // Follow mode based on root url
-                $rootUrl = $this->urls[0];  // assume the first url is the root
+                $rootUrl = $this->rootUrl;
                 $rootUrlParsed = parse_url($rootUrl);  // assume the first url is the root
                 switch ($this->followMode) {
                     case 0:
