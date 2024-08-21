@@ -617,7 +617,7 @@ class Crawler
                     case 1:
                     case 2:
                         // follow links with same host
-                        if ($parsedUrl['host'] !== $rootUrlParsed['host']) {
+                        if (isset($parsedUrl['host']) && $parsedUrl['host'] !== $rootUrlParsed['host']) {
                             self::log('Skipping (wrong domain/subdomain): ' . $url, "info");
                             continue 2;
                         }
