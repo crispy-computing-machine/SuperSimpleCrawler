@@ -178,7 +178,7 @@ class Crawler
      * /tmp Default directory
      * @var string
      */
-    private string $workingDirectory = '/tmp';
+    private string $workingDirectory;
 
     /**
      * verify SSl certificates
@@ -448,6 +448,11 @@ class Crawler
      */
     public function setWorkingDirectory(string $directory): ?bool
     {
+
+        if($directory === null){
+            return true;
+        }
+        
         if (!is_dir($directory) || !is_writable($directory)) {
             if(!mkdir($directory) && !is_dir($directory)){
                 throw new RuntimeException('Invalid working directory');
