@@ -704,7 +704,7 @@ class Crawler
                         }
 
                         if(count($links) == 0){
-                            self::log('No links to add: ' . $link . ' (Root:'.$rootUrl.')', "info");
+                            self::log('No links to add: (Root:'.$rootUrl.')', "info");
                         }
 
                         // If a callback function is set, call it
