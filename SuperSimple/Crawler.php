@@ -472,7 +472,7 @@ class Crawler
     public function setCertificateVerify(bool $verify): void
     {
         $this->certificateVerify = $verify;
-        if($this->certificateVerify){
+        if($this->certificateVerify && isset($this->workingDirectory)){
             // Download the cacert.pem file
             file_put_contents($this->cacertPath = $this->workingDirectory . '/cacert.pem', file_get_contents('https://curl.se/ca/cacert.pem'));
         }
@@ -771,7 +771,7 @@ class Crawler
             $clientOptions['headers'] = ['User-Agent' => $this->userAgent];
         }
 
-        if ($this->certificateVerify) {
+        if ($this->certificateVerify && isset($this->cacertPath)) {
             $clientOptions['verify'] = $this->cacertPath;
         } else {
             $clientOptions['verify'] = false; // insecure
